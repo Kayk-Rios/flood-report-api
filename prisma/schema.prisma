@@ -1,64 +1,56 @@
+// prisma/schema.prisma
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "sqlite"
-  url      = "file:./dev.db" // Para SQL em memória, usaremos :memory:
+  url      = "file:./dev.db"
 }
 
-model User {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
-  password  String
-  name      String
-  isAdmin   Boolean  @default(false)
-  posts     Post[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model State {
-  id        Int      @id @default(autoincrement())
-  name      String   @unique
-  uf        String   @unique 
-  cities    City[]
-  posts     Post[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model City {
-  id        Int      @id @default(autoincrement())
-  name      String
-  state     State    @relation(fields: [stateId], references: [id])
-  stateId   Int
-  neighborhoods String
-  posts     Post[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@unique([name, stateId])
-}
-
-enum FloodSeverity {
+enum FloodLevel {
   LOW
   MEDIUM
   HIGH
 }
 
+model User {
+  id        Int       @id @default(autoincrement())
+  email     String    @unique
+  password  String
+  name      String
+  isAdmin   Boolean   @default(false)
+  posts     Post[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model State {
+  id     Int     @id @default(autoincrement())
+  name   String  @unique
+  uf     String  @unique
+  cities City[]
+}
+
+model City {
+  id      Int     @id @default(autoincrement())
+  name    String
+  state   State   @relation(fields: [stateId], references: [id])
+  stateId Int
+  posts   Post[]
+}
+
 model Post {
-  id           Int          @id @default(autoincrement())
-  title        String
-  description  String
-  severity     FloodSeverity
-  author       User         @relation(fields: [authorId], references: [id])
-  authorId     Int
-  state        State        @relation(fields: [stateId], references: [id])
-  stateId      Int
-  city         City         @relation(fields: [cityId], references: [id])
-  cityId       Int
-  neighborhood String
-  createdAt    DateTime     @default(now())
-  updatedAt    DateTime     @updatedAt
+  id          Int       @id @default(autoincrement())
+  title       String
+  description String
+  floodLevel  FloodLevel
+  address     String?
+  neighborhood String?
+  author      User      @relation(fields: [authorId], references: [id])
+  authorId    Int
+  city        City      @relation(fields: [cityId], references: [id])
+  cityId      Int
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }
