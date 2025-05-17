@@ -33,17 +33,47 @@ type City {
   state: State!
 }
 
+type Post {
+  id: ID!
+  title: String!
+  description: String!
+  floodLevel: FloodLevel!
+  address: String
+  neighborhood: String
+  author: User!
+  city: City!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""Níveis de inundação"""
+enum FloodLevel {
+  LOW
+  MEDIUM
+  HIGH
+}
+
 type Query {
   users: [User!]!
   user(id: ID!): User
   states: [State!]!
   citiesByState(stateId: ID!): [City!]!
   city(id: ID!): City
+  posts: [Post!]!
+  postsByState(stateId: Float!): [Post!]!
+  postsByCity(cityId: Float!): [Post!]!
+  postsByNeighborhood(neighborhood: String!): [Post!]!
+  post(id: Float!): Post!
 }
 
 type Mutation {
   signup(signupInput: SignupInput!): Auth!
   login(loginInput: LoginInput!): Auth!
+  createPost(createPostInput: CreatePostInput!): Post!
+  updatePost(updatePostInput: UpdatePostInput!): Post!
+  removePost(id: Float!): Post!
+  adminUpdatePost(updatePostInput: UpdatePostInput!): Post!
+  adminRemovePost(id: Float!): Post!
 }
 
 input SignupInput {
@@ -55,4 +85,23 @@ input SignupInput {
 input LoginInput {
   email: String!
   password: String!
+}
+
+input CreatePostInput {
+  title: String!
+  description: String!
+  floodLevel: FloodLevel!
+  address: String
+  neighborhood: String
+  cityId: Float!
+}
+
+input UpdatePostInput {
+  title: String
+  description: String
+  floodLevel: FloodLevel
+  address: String
+  neighborhood: String
+  cityId: Float
+  id: Float!
 }
