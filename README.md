@@ -46,3 +46,7 @@
 - Gerenciar usuários e postagens.
 - Atualizar, excluir e deletar qualquer publicação.
 - Gerar relatórios com todos os dados do banco.
+
+🧑‍🎓 Autor
+Desenvolvido por Kayk Dario — Projeto alagou ai.
+
