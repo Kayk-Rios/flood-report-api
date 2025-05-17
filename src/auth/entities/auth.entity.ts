@@ -6,7 +6,7 @@ export class Auth {
   @Field()
   token: string;
 
-  @Field()
+  @Field(()=>User)
   user: User;
 }
 
