@@ -1,22 +1,36 @@
 import { Injectable, NestMiddleware } from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
-import { User } from 'src/users/entities/user.entity';
+import { JwtService } from '@nestjs/jwt';
+import { AuthService } from './auth.service';
 
 @Injectable()
 export class AuthMiddleware implements NestMiddleware {
-  use(req: Request, res: Response, next: NextFunction) {
- 
-    const token = req.headers['authorization'];
-    if (token === 'session-token') {
+  constructor(
+    private jwtService: JwtService,
+    private authService: AuthService
+  ) {}
+  async use(req: Request, res: Response, next: NextFunction) {
 
-        req.user = { 
-          id: 1, 
-          email: 'admin@example.com',
-          name: 'Admin',
-          isAdmin: true,
-          createdAt: new Date(),
-          updatedAt: new Date()
-        } as User;
+  const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.split(' ')[0] === 'Bearer') {
+      const token = authHeader.split(' ')[1];
+
+      try {
+        const payload = await this.jwtService.verifyAsync<{ sub: number }>(token);
+        const user = await this.authService.validateUser(payload.sub);
+
+
+        if (user) {
+          req.user = {
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            isAdmin: user.isAdmin,
+          } 
+        }
+      } catch (err) {
+          console.error('Token validation error:', err.message);
+      }
       }
     next();
   }
