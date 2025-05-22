@@ -1,4 +1,5 @@
 import { ObjectType, Field, ID } from '@nestjs/graphql';
+import { City } from './city.entity';
 
 @ObjectType()
 export class State {
@@ -10,4 +11,7 @@ export class State {
 
   @Field()
   uf: string;
+
+  @Field(() => [City], { nullable: true }) 
+  cities?: City[];
 }
