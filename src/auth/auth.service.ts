@@ -1,14 +1,17 @@
 import { Injectable } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import { Auth } from './entities/auth.entity';
 import { SignupInput } from './dto/signup.input';
 import { LoginInput } from './dto/login.input';
-import { User } from 'src/users/entities/user.entity';
+
 
 @Injectable()
 export class AuthService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService,
+    private jwtService: JwtService
+  ) {}
 
   async signup(signupInput: SignupInput): Promise<Auth> {
     const hashedPassword = await bcrypt.hash(signupInput.password, 10);
@@ -21,8 +24,14 @@ export class AuthService {
       },
     });
 
+    const payload = { 
+      sub: user.id,
+      email: user.email,
+      isAdmin: user.isAdmin 
+    };
+
     return {
-      token: 'session-token', 
+      token:  this.jwtService.sign(payload),
       user: {
         id: user.id,
         email: user.email,
@@ -46,8 +55,14 @@ export class AuthService {
       throw new Error('Invalid password');
     }
 
+    const payload = { 
+      sub: user.id,
+      email: user.email,
+      isAdmin: user.isAdmin 
+    };
+
     return {
-      token: 'session-token',
+      token: this.jwtService.sign(payload),
       user: {
         id: user.id,
         email: user.email,
@@ -57,21 +72,25 @@ export class AuthService {
     };
   }
 
-  async validateUser(userId: number): Promise<User> {
+  async validateUser(userId: number): Promise<{
+    id: number;
+    email: string;
+    name: string;
+    isAdmin: boolean;
+  } | null> {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
     });
-
+  
     if (!user) {
-      throw new Error('User not found');
+      return null;
     }
-
+  
     return {
       id: user.id,
       email: user.email,
       name: user.name,
       isAdmin: user.isAdmin,
-      
     };
   }
 }
