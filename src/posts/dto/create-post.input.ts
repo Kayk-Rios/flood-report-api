@@ -13,11 +13,12 @@ export class CreatePostInput {
   floodLevel: FloodLevel;
 
   @Field({ nullable: true })
-  address?: string;
+  address: string;
 
   @Field({ nullable: true })
-  neighborhood?: string;
+  neighborhood: string;
 
   @Field(() => Number)
   cityId: number;
 }
+
