@@ -21,16 +21,17 @@ type Auth {
   user: User!
 }
 
-type State {
-  id: ID!
-  name: String!
-  uf: String!
-}
-
 type City {
   id: ID!
   name: String!
   state: State!
+}
+
+type State {
+  id: ID!
+  name: String!
+  uf: String!
+  cities: [City!]
 }
 
 type Post {
@@ -69,6 +70,12 @@ type Query {
 type Mutation {
   signup(signupInput: SignupInput!): Auth!
   login(loginInput: LoginInput!): Auth!
+  createState(createStateInput: CreateStateInput!): State!
+  updateState(updateStateInput: UpdateStateInput!): State!
+  deleteState(id: ID!): State!
+  createCity(createCityInput: CreateCityInput!): City!
+  updateCity(updateCityInput: UpdateCityInput!): City!
+  deleteCity(id: ID!): City!
   createPost(createPostInput: CreatePostInput!): Post!
   updatePost(updatePostInput: UpdatePostInput!): Post!
   removePost(id: Float!): Post!
@@ -85,6 +92,28 @@ input SignupInput {
 input LoginInput {
   email: String!
   password: String!
+}
+
+input CreateStateInput {
+  name: String!
+  uf: String!
+}
+
+input UpdateStateInput {
+  name: String
+  uf: String
+  id: ID!
+}
+
+input CreateCityInput {
+  name: String!
+  stateId: Int!
+}
+
+input UpdateCityInput {
+  name: String
+  stateId: Int
+  id: Int!
 }
 
 input CreatePostInput {
