@@ -65,6 +65,7 @@ type Query {
   postsByCity(cityId: Float!): [Post!]!
   postsByNeighborhood(neighborhood: String!): [Post!]!
   post(id: Float!): Post!
+  myPosts: [Post!]!
 }
 
 type Mutation {
