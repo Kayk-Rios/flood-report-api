@@ -205,4 +205,17 @@ async adminRemove(id: number): Promise<Post> {
   });
   return this.toPostEntity(deletedPost);
 }    
+
+
+async findPostsByUser(userId: number): Promise<Post[]> {
+  return this.prisma.post.findMany({
+    where: { authorId: userId },
+    include: {
+      city: { include: { state: true } },
+      author: true,
+    },
+  });
+}
+
+
 }
