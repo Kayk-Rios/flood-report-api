@@ -2,13 +2,14 @@ import {
   Injectable,
   ExecutionContext,
   UnauthorizedException,
+  CanActivate,
 } from '@nestjs/common';
 import { GqlExecutionContext } from '@nestjs/graphql';
 import { JwtService } from '@nestjs/jwt';
 import { AuthService } from './auth.service';
 
 @Injectable()
-export class AuthGuard {
+export class AuthGuard implements CanActivate {
   constructor(
     private jwtService: JwtService,
     private authService: AuthService,
@@ -20,22 +21,28 @@ export class AuthGuard {
 
     const token = this.extractToken(req);
     if (!token) {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException('Token not found');
     }
 
     try {
-      const payload = await this.jwtService.verifyAsync(token);
-      const user = await this.authService.validateUser(payload);
+    
+      const payload = await this.jwtService.verifyAsync(token, {
+        secret: process.env.JWT_SECRET,
+      });
 
+      const user = await this.authService.validateUser(payload.sub);
       if (!user) {
-        throw new UnauthorizedException();
+        throw new UnauthorizedException('User not found');
       }
+
       req.user = user;
       return true;
-    } catch {
-      throw new UnauthorizedException();
+    } catch (err) {
+      console.error('Token validation error:', !!err.message);
+      throw new UnauthorizedException('Token validation failed');
     }
   }
+
   private extractToken(request: any): string | undefined {
     const [type, token] = request.headers.authorization?.split(' ') ?? [];
     return type === 'Bearer' ? token : undefined;

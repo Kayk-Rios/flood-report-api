@@ -8,12 +8,13 @@ import { PrismaService } from './prisma/prisma.service';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true});
   
-
   const prismaService = app.get(PrismaService);
   const jwtService = app.get(JwtService);
-  const authService = new AuthService(prismaService, jwtService);
-  
-  app.use(new AuthMiddleware(jwtService, authService).use);
+  const authService = app.get(AuthService);
+  app.use(async (req, res, next) => {
+    const middleware = new AuthMiddleware(jwtService, authService);
+    await middleware.use(req, res, next);
+  });
   
   await app.listen(3001);
 }
