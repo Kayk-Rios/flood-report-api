@@ -74,4 +74,12 @@ export class PostsResolver {
   adminRemovePost(@Args('id', { type: () => Number }) id: number) {
     return this.postsService.adminRemove(id);
   }
+  @UseGuards(AuthGuard)
+  @Query(() => [Post], { name: 'myPosts' })
+  findMyPosts(@Context() context: any): Promise<Post[]> {
+    const userId = context.req.user.id;
+    return this.postsService.findPostsByUser(userId);
+  }
+
+  
 }
